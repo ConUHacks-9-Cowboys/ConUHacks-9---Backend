@@ -1,13 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/static/globals.css" />
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
-    Woohoooo! Name: {{name}}
-    <hr />
-    Index: {{index}}
+    <img class="hat-image" src="/static/img/hat_image.png" alt="Hat Image" />
+    <img
+      class="boots-image"
+      src="/static/img/boots_image.png"
+      alt="Boots Image"
+    />
+    <div class="screen">
+      <button class="exit-button-container" onclick="window.close()">
+        <div class="exit-button-text">Exit</div>
+      </button>
+      <div class="header">
+        <div class="logo">
+          <img class="image" src="/static/img/logo.png" alt="logo" />
+        </div>
+      </div>
+      <div class="body">
+        <div class="video-container">
+          <div class="exercice-name-container">
+            <div class="exercice-name">{{name}}</div>
+          </div>
+          <div class="example-video-container">
+            <video autoplay loop muted playsinline class="example-video">
+              <source src="/static/videos/{{index}}.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div class="right-container">
+          <div class="webcam-container">
+            <video class="webcam" id="webcam" autoplay playsinline></video>
+          </div>
+          <div class="description-container">
+            <div class="description">
+              <span class="description-title">Description</span>
+              <br />
+              {{ instructions }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/static/script.js"></script>
   </body>
 </html>

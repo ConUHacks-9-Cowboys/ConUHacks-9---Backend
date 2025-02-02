@@ -6,10 +6,14 @@ from capture import start_capture
 from models import NewExercise
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import json
 
 app = FastAPI()
 browser = Browser()
+
+# Mount the "static" directory at the "/static" URL path
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 async def periodic_capture():
@@ -42,7 +46,7 @@ async def root():
     frame = shared_dict["frame"]
     result = json.loads(send_image(frame).message.content)["level"]
     text_to_speech(f"Alexa! open wellness cowboy")
-    await asyncio.sleep(13)
+    await asyncio.sleep(11)
     text_to_speech(f"The stress level is {result}")
 
     return {"message": "done"}
@@ -61,7 +65,8 @@ async def cancel():
 
 @app.post("/user/exercise/done")
 async def done():
-    pass
+    browser.close()
+    return {"message": "done"}
 
 
 @app.post("/user/stressed")
@@ -72,16 +77,22 @@ async def is_stressed():
 @app.post("/user/exercise/new")
 async def new(exercise: NewExercise):
     browser.open_url(
-        f"http://localhost:8000/exercise/?name={exercise.name}&index={exercise.index}"
+        f"http://localhost:8000/exercise/?name={exercise.name}&index={exercise.index}&instructions={exercise.instructions}"
     )
 
     return {"message": "done"}
 
 
 @app.get("/exercise/")
-async def show_exercise(request: Request, name: str, index: int):
+async def show_exercise(request: Request, name: str, index: int, instructions: str):
     return templates.TemplateResponse(
-        "index.html", {"request": request, "name": name, "index": index}
+        "index.html",
+        {
+            "request": request,
+            "name": name,
+            "index": index,
+            "instructions": instructions,
+        },
     )
 
 
