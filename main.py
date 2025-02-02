@@ -8,6 +8,11 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import json
+from playsound import playsound
+from pathlib import Path
+
+open_file_path = Path(__file__).parent / "open.mp3"
+
 
 app = FastAPI()
 browser = Browser()
@@ -23,8 +28,16 @@ async def periodic_capture():
             pass
 
         frame = shared_dict["frame"]
-        result = send_image(frame)
-        await asyncio.sleep(10)
+        result = json.loads(send_image(frame).message.content)["level"]
+        print(f"Asked OpenAI for stress level: {result}")
+        if result > 5:
+            playsound(str(open_file_path))
+            await asyncio.sleep(11)
+            text_to_speech(f"The stress level is {result}")
+
+            await asyncio.sleep(60)
+
+        await asyncio.sleep(4)
 
 
 templates = Jinja2Templates(directory="templates")
@@ -33,8 +46,8 @@ templates = Jinja2Templates(directory="templates")
 @app.on_event("startup")
 async def start_periodic_task():
     # Run the periodic task in the background
-    # asyncio.create_task(periodic_capture())
-    pass
+    asyncio.create_task(periodic_capture())
+    # pass
 
 
 @app.get("/")
@@ -45,7 +58,6 @@ async def root():
 
     frame = shared_dict["frame"]
     result = json.loads(send_image(frame).message.content)["level"]
-    text_to_speech(f"Alexa! open wellness cowboy")
     await asyncio.sleep(11)
     text_to_speech(f"The stress level is {result}")
 
